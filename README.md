@@ -1,4 +1,4 @@
-# API Série C - Live Goal ⚽
+# API Série C - Live Gol ⚽
 
 API desenvolvida em **FastAPI** para rastreamento de partidas da **Série C do Campeonato Brasileiro**, focada em fornecer dados em tempo real, placares, status de partidas e ocorrências detalhadas.
 
