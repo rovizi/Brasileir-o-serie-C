@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from database import buscar_dados_seriec_externos
-from models import formatar_jogo_seriec
+from models import formatar_jogo_seriec, formatar_tabela_seriec
 
 router = APIRouter(prefix="/api/seriec", tags=["Série C"])
 
@@ -14,7 +14,7 @@ def get_jogos_seriec():
             jogos_formatados.append(formatar_jogo_seriec(i, evento))
         return jogos_formatados
 
-    # Fallback estruturado com dados visuais completos
+    # Fallback estruturado com dados visuais completos para os jogos
     return [{
         "id": 1,
         "rodada": "Rodada Atual",
@@ -37,3 +37,35 @@ def get_jogos_seriec():
         },
         "campeonato": "Brasileirão Série C",
     }]
+
+@router.get("/tabela")
+def get_tabela_seriec():
+    # Retorno estruturado para a tabela de classificação da Série C
+    return [
+        {
+            "posicao": 1,
+            "time": "Botafogo-PB",
+            "logo": "",
+            "pontos": 35,
+            "jogos": 18,
+            "vitorias": 10,
+            "empates": 5,
+            "derrotas": 3,
+            "gols_pro": 28,
+            "gols_contra": 15,
+            "saldo_gols": 13
+        },
+        {
+            "posicao": 2,
+            "time": "Volta Redonda",
+            "logo": "",
+            "pontos": 33,
+            "jogos": 18,
+            "vitorias": 9,
+            "empates": 6,
+            "derrotas": 3,
+            "gols_pro": 25,
+            "gols_contra": 16,
+            "saldo_gols": 9
+        }
+    ]
