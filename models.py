@@ -38,3 +38,19 @@ def formatar_jogo_seriec(i, evento):
         },
         "campeonato": "Brasileirão Série C",
     }
+
+
+def formatar_tabela_seriec(i, posicao):
+    return {
+        "posicao": i + 1,
+        "time": posicao.get("strTeam", "Time"),
+        "logo": posicao.get("strBadge", ""),
+        "pontos": int(posicao.get("intPoints", 0)),
+        "jogos": int(posicao.get("intPlayed", 0)),
+        "vitorias": int(posicao.get("intWin", 0)),
+        "empates": int(posicao.get("intDraw", 0)),
+        "derrotas": int(posicao.get("intLoss", 0)),
+        "gols_pro": int(posicao.get("intGoalsFor", 0)),
+        "gols_contra": int(posicao.get("intGoalsAgainst", 0)),
+        "saldo_gols": int(posicao.get("intGoalDifference", 0)),
+    }
