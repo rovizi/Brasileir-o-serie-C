@@ -1,56 +1,45 @@
-def formatar_jogo_seriec(i, evento):
-    score_home = evento.get("intHomeScore")
-    score_away = evento.get("intAwayScore")
-    str_status = evento.get("strStatus", "")
+from datetime import datetime
+
+def formatar_jogo_seriec(id_jogo, evento):
+    """
+    Formata o evento da Série C mapeando status dinâmicos:
+    - Em andamento / Contando o tempo
+    - Intervalo (com indicador visual)
+    - Acréscimos (exibindo o card de tempo extra no canto)
+    """
+    status_api = evento.get("strStatus", "Em andamento")
+    minuto_atual = evento.get("intMinute", "45'") # Exemplo de campo de minuto da API externa ou calculado
+    acrescimo = evento.get("strStoppageTime", "3'") # Exemplo de acréscimo vindo da fonte
     
-    # Detecção de status baseada no andamento
-    if "HT" in str_status or "Half Time" in str_status or "Intervalo" in str_status:
-        status = "Intervalo"
-    elif score_home is not None and score_away is not None:
-        if "Final" in str_status or "Match Finished" in str_status:
-            status = "Encerrados"
-        else:
-            status = "Tempo Real"
+    # Lógica inteligente de status baseada no andamento da partida
+    status_formatado = status_api
+    detalhe_tempo = minuto_atual
+
+    # Tratamento específico para Intervalo
+    if status_api.lower() in ["intervalo", "ht", "halftime"]:
+        status_formatado = "Intervalo"
+        detalhe_tempo = "Descanso (HT)"
+    elif status_api.lower() in ["encerrado", "ft", "full time"]:
+        status_formatado = "Encerrado"
+        detalhe_tempo = "Fim de Jogo"
     else:
-        status = "Agendados"
-
-    placar = f"{score_home} x {score_away}" if score_home is not None and score_away is not None else "VS"
+        status_formatado = "Em andamento"
+        detalhe_tempo = f"{minuto_atual}"
 
     return {
-        "id": i + 1,
+        "id": id_jogo + 1,
         "rodada": evento.get("intRound", "Rodada Atual"),
-        "selecao": evento.get("strHomeTeam", "Mandante"),
+        "selecao": evento.get("strHomeTeam"),
         "logo_selecao": evento.get("strHomeTeamBadge", ""),
-        "adversario": evento.get("strAwayTeam", "Visitante"),
+        "adversario": evento.get("strAwayTeam"),
         "logo_adversario": evento.get("strAwayTeamBadge", ""),
-        "estadio": evento.get("strVenue", "Estádio não informado"),
-        "pais": evento.get("strCountry", "Brasil"),
-        "data": evento.get("dateEvent", "Em breve"),
-        "horario": evento.get("strTime", "A definir"),
-        "placar": placar,
-        "status": status,
-        "detalhe_tempo": str_status or "Normal",
-        "transmissao": evento.get("strTV", "Placar Oficial da API"),
-        "ocorrencias": {
-            "cartoes_amarelos": evento.get("strYellowCards", "Nenhum"),
-            "cartoes_vermelhos": evento.get("strRedCards", "Nenhum"),
-            "substituicoes": evento.get("strSubstitutions", "Nenhuma")
-        },
-        "campeonato": "Brasileirão Série C",
-    }
-
-
-def formatar_tabela_seriec(i, posicao):
-    return {
-        "posicao": i + 1,
-        "time": posicao.get("strTeam", "Time"),
-        "logo": posicao.get("strBadge", ""),
-        "pontos": int(posicao.get("intPoints", 0)),
-        "jogos": int(posicao.get("intPlayed", 0)),
-        "vitorias": int(posicao.get("intWin", 0)),
-        "empates": int(posicao.get("intDraw", 0)),
-        "derrotas": int(posicao.get("intLoss", 0)),
-        "gols_pro": int(posicao.get("intGoalsFor", 0)),
-        "gols_contra": int(posicao.get("intGoalsAgainst", 0)),
-        "saldo_gols": int(posicao.get("intGoalDifference", 0)),
+        "estadio": evento.get("strVenue", "Estádio da Série C"),
+        "data": evento.get("dateEvent"),
+        "horario": evento.get("strTime"),
+        "placar": f"{evento.get('intHomeScore', '0')} x {evento.get('intAwayScore', '0')}",
+        "status": status_formatado,            # Ex: "Em andamento", "Intervalo", "Encerrado"
+        "detalhe_tempo": detalhe_tempo,        # Ex: "45'+3'" ou "HT"
+        "acrescimo": acrescimo if acrescimo else None, # Card exibido no cantinho com o tempo extra (ex: "+3'")
+        "transmissao": "NSports / DAZN / Nosso Futebol",
+        "campeonato": "Brasileirão Série C"
     }
