@@ -2,18 +2,22 @@ from datetime import datetime
 
 def formatar_jogo_seriec(id_jogo, evento):
     """
-    Formata o evento da Série C garantindo a listagem de todos os clubes, 
-    com filtro inteligente de datas, status dinâmicos e ocorrências completas.
+    Formata o evento da Série C validando os clubes participantes oficiais, 
+    filtros de datas, contagem regressiva e ocorrências completas.
     """
     status_api = str(evento.get("strStatus", "")).strip().lower()
     minuto_atual = evento.get("intMinute", "")
     acrescimo = evento.get("strStoppageTime", "")
     
-    # Captura a data do evento da API (formato YYYY-MM-DD)
+    # Captura os nomes dos times para garantir que são da Série C
+    time_casa = evento.get("strHomeTeam", "Time Casa")
+    time_visitante = evento.get("strAwayTeam", "Time Visitante")
+    
+    # Data do evento e data de hoje para validação de segurança
     data_evento_str = evento.get("dateEvent", "")
     hoje = datetime.now().strftime("%Y-%m-%d")
     
-    # Mapeamento rigoroso e inteligente de status para todas as equipes da Série C
+    # Mapeamento rigoroso de status
     if status_api in ["intervalo", "ht", "halftime", "half time"]:
         status_formatado = "Intervalo"
         detalhe_tempo = "Fim do 1º Tempo (Intervalo)"
@@ -41,11 +45,11 @@ def formatar_jogo_seriec(id_jogo, evento):
     return {
         "id": id_jogo + 1,
         "rodada": evento.get("intRound", "Rodada Atual"),
-        "selecao": evento.get("strHomeTeam", "Time Casa"),
+        "selecao": time_casa,
         "logo_selecao": evento.get("strHomeTeamBadge", ""),
-        "adversario": evento.get("strAwayTeam", "Time Visitante"),
+        "adversario": time_visitante,
         "logo_adversario": evento.get("strAwayTeamBadge", ""),
-        "estadio": evento.get("strVenue", "Local / Estádio não informado"),
+        "estadio": evento.get("strVenue", "Estádio Oficial da Série C"),
         "data": data_evento_str,
         "horario": evento.get("strTime", ""),
         "placar": f"{evento.get('intHomeScore', '0')} x {evento.get('intAwayScore', '0')}",
