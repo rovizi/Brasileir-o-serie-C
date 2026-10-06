@@ -2,20 +2,18 @@ from datetime import datetime
 
 def formatar_jogo_seriec(id_jogo, evento):
     """
-    Formata o evento da Série C aplicando filtros rígidos de data, 
-    status dinâmicos e ocorrências completas (cartões, faltas, pênaltis).
+    Formata o evento da Série C garantindo a listagem de todos os clubes, 
+    com filtro inteligente de datas, status dinâmicos e ocorrências completas.
     """
     status_api = str(evento.get("strStatus", "")).strip().lower()
     minuto_atual = evento.get("intMinute", "")
     acrescimo = evento.get("strStoppageTime", "")
     
-    # Captura a data do evento da API (ex: "2026-10-06")
+    # Captura a data do evento da API (formato YYYY-MM-DD)
     data_evento_str = evento.get("dateEvent", "")
-    
-    # Validação de segurança para ignorar jogos com datas retroativas fantasmas
     hoje = datetime.now().strftime("%Y-%m-%d")
     
-    # Mapeamento rigoroso de status
+    # Mapeamento rigoroso e inteligente de status para todas as equipes da Série C
     if status_api in ["intervalo", "ht", "halftime", "half time"]:
         status_formatado = "Intervalo"
         detalhe_tempo = "Fim do 1º Tempo (Intervalo)"
@@ -26,10 +24,10 @@ def formatar_jogo_seriec(id_jogo, evento):
         status_formatado = "Adiado"
         detalhe_tempo = "Adiado"
     elif status_api in ["agendado", "ns", "not started", ""] or not status_api:
-        # Se a data do jogo for anterior a hoje e não encerrou, força para Encerrado/Ignorado para não ficar preso
+        # Se a data do jogo já passou e o status continuava agendado, joga para Encerrado
         if data_evento_str and data_evento_str < hoje:
             status_formatado = "Encerrado"
-            detalhe_tempo = "Encerrado (Histórico)"
+            detalhe_tempo = "Encerrado"
         else:
             status_formatado = "Agendado"
             detalhe_tempo = evento.get("strTime", "Em breve")
